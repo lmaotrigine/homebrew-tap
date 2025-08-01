@@ -1,0 +1,18 @@
+[[formula]]
+repo = "lmaotrigine/klip"
+homepage = "https://github.com/lmaotrigine/klip"
+desc = "Copy/paste anything over the network"
+license = "MPL-2.0"
+bins = ["klip"]
+mans = ["doc/klip.1"]
+completions = ["completions/klip.bash", "completions/_klip"]
+darwin_ext = "zip"
+archive_fmt = "{name}-{arch}.full.{ext}"
+
+[[formula]]
+repo = "lmaotrigine/heartbeat"
+homepage = "https://github.com/lmaotrigine/heartbeat"
+desc = "A service to show a live digital heartbeat (ping) on multiple devices "
+license = "MPL-2.0"
+bins = ["heartbeat"]
+archive_fmt = "{name}-{version}-{arch}.{ext}"

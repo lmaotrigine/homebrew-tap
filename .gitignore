@@ -1,0 +1,10 @@
+# exclude everything, but allow negating subpaths
+/*/
+/*
+# opt in for inclusion
+!.github
+!Formula
+!.gitignore
+!.tap.toml
+!tap.py
+!README.md
