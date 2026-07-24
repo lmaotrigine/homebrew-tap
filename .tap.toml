@@ -7,7 +7,6 @@ bins = ["klip"]
 mans = ["doc/klip.1"]
 completions = ["completions/klip.bash", "completions/_klip"]
 darwin_ext = "zip"
-archive_fmt = "{name}-{arch}.full.{ext}"
 
 [[formula]]
 repo = "lmaotrigine/heartbeat"
