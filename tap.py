@@ -346,25 +346,24 @@ class HomebrewContext:
         self.formula: Formula = formula
         self.new_version: str = github_version
 
-    def fetch_and_hash(self, url: str) -> str:
-        _log.info('Fetching archive from %s...', cyan(url))
+    def fetch_hash(self, url: str) -> str:
+        _log.info('Fetching sha256 checksum from %s...', cyan(url))
         if self.dry_run:
             _log.info('Dry run: Would fetch %s', bright_yellow('archive'))
             return sha256(url.encode('utf-8')).hexdigest()
         with urlopen(url) as resp:
             if resp.status != 200:
-                err_text = resp.read().decude('utf-8')
-                _log.error('Failed to fetch archive: HTTP status %s, Response: %s', red(resp.status), red(err_text))
-                msg = f'Failed to fetch archive: HTTP status {resp.status}'
+                err_text = resp.read().decode('utf-8')
+                _log.error('Failed to fetch checksum: HTTP status %s, Response: %s', red(resp.status), red(err_text))
+                msg = f'Failed to fetch checksum: HTTP status {resp.status}'
                 raise RuntimeError(msg)
-            body = resp.read()
-        count = len(body)
-        sha = sha256(body).hexdigest()
-        _log.info('Archive fetched (%s bytes) and SHA256 %s', green(count), green('computed'))
+            body = resp.read().decode('utf-8')
+        sha = body[:64]
+        _log.info('sha256 checksum %s', green('fetched'))
         return sha
 
     def get_archive(self, url: str) -> Archive:
-        return Archive(url=url, sha256=self.fetch_and_hash(url))
+        return Archive(url=url, sha256=self.fetch_hash(url + '.sha256'))
 
     def package_artifact_url(self, arch: str) -> str:
         ext = self.formula.darwin_ext if arch.endswith('darwin') else self.formula.linux_ext
