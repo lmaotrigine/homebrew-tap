@@ -511,10 +511,10 @@ def update_tap() -> None:
                 'git',
                 ['commit', '-m', full_msg],
                 {
-                    'GIT_AUTHOR_NAME': 'homebrew-tap',
-                    'GIT_AUTHOR_EMAIL': 'isis@5ht2.me',
-                    'GIT_COMMITTER_NAME': 'homebrew-tap',
-                    'GIT_COMMITTER_EMAIL': 'isis@5ht2.me',
+                    'GIT_AUTHOR_NAME': 'github-actions[bot]',
+                    'GIT_AUTHOR_EMAIL': 'github-actions[bot]@users.noreply.github.com',
+                    'GIT_COMMITTER_NAME': 'github-actions[bot]',
+                    'GIT_COMMITTER_EMAIL': 'github-actions[bot]@users.noreply.github.com',
                     'TZ': 'UTC',
                 },
             )
