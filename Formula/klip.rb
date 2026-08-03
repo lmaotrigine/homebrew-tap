@@ -4,26 +4,26 @@
 class Klip < Formula
   desc "Copy/paste anything over the network"
   homepage "https://github.com/lmaotrigine/klip"
-  version "0.2.0"
+  version "0.3.0"
   license "MPL-2.0"
 
   if OS.mac?
     on_intel do
-      url "https://github.com/lmaotrigine/klip/releases/download/0.2.0/klip-x86_64-apple-darwin.zip"
-      sha256 "3c3aab887e403a8c6615776739cd313f750245209c43e13297abcd1adea2db28"
+      url "https://github.com/lmaotrigine/klip/releases/download/0.3.0/klip-x86_64-apple-darwin.zip"
+      sha256 "14c66272390786280d5f832a458e9e42826b8fd2f13fdc40b07a7e5d3fff7215"
     end
     on_arm do
-      url "https://github.com/lmaotrigine/klip/releases/download/0.2.0/klip-aarch64-apple-darwin.zip"
-      sha256 "c1dcbd6490ca846e2380a7c886d9addd97c1dd0f49e7f15caa8d403bcb3bece6"
+      url "https://github.com/lmaotrigine/klip/releases/download/0.3.0/klip-aarch64-apple-darwin.zip"
+      sha256 "786019af71b4e091a7bda84c4b2e53aa16e727f370c379d1f2a5759572459e91"
     end
   elsif OS.linux?
     on_intel do
-      url "https://github.com/lmaotrigine/klip/releases/download/0.2.0/klip-x86_64-unknown-linux-musl.tar.xz"
-      sha256 "9eb42d6fdae383b801664eecd9a14bdef644af7b85b6a2b640535e2c9284c12b"
+      url "https://github.com/lmaotrigine/klip/releases/download/0.3.0/klip-x86_64-unknown-linux-musl.tar.xz"
+      sha256 "922f141a493a38f50abf240d58e385518493e88ca71638a6e998271ac462e03a"
     end
     on_arm do
-      url "https://github.com/lmaotrigine/klip/releases/download/0.2.0/klip-aarch64-unknown-linux-musl.tar.xz"
-      sha256 "670bde4c28978645dd47abd878eeea1c966aa83813b6ed322607e6444e29158b"
+      url "https://github.com/lmaotrigine/klip/releases/download/0.3.0/klip-aarch64-unknown-linux-musl.tar.xz"
+      sha256 "dc15127cff888663f8cad3cbf5e257e5d993d94d34ce7cceb7c55099676b0f22"
     end
   end
 
