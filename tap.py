@@ -349,7 +349,7 @@ class HomebrewContext:
     def fetch_hash(self, url: str) -> str:
         _log.info('Fetching sha256 checksum from %s...', cyan(url))
         if self.dry_run:
-            _log.info('Dry run: Would fetch %s', bright_yellow('archive'))
+            _log.info('Dry run: Would fetch %s', bright_yellow('checksum'))
             return sha256(url.encode('utf-8')).hexdigest()
         with urlopen(url) as resp:
             if resp.status != 200:
@@ -374,25 +374,18 @@ class HomebrewContext:
 
     def update_formula(self) -> None:
         _log.info('Updating Homebrew %s...', bright_yellow('formula'))
-        mac_aarch64_url = self.package_artifact_url('aarch64-apple-darwin')
-        mac_x86_64_url = self.package_artifact_url('x86_64-apple-darwin')
-        linux_aarch64_url = self.package_artifact_url('aarch64-unknown-linux-musl')
-        linux_x86_64_url = self.package_artifact_url('x86_64-unknown-linux-musl')
-        with cf.ThreadPoolExecutor(max_workers=4) as executor:
-            mac_aarch64_future = executor.submit(self.get_archive, mac_aarch64_url)
-            mac_x86_64_future = executor.submit(self.get_archive, mac_x86_64_url)
-            linux_aarch64_future = executor.submit(self.get_archive, linux_aarch64_url)
-            linux_x86_64_future = executor.submit(self.get_archive, linux_x86_64_url)
-            mac_aarch64 = mac_aarch64_future.result()
-            mac_x86_64 = mac_x86_64_future.result()
-            linux_aarch64 = linux_aarch64_future.result()
-            linux_x86_64 = linux_x86_64_future.result()
-        archives = Archives(
-            mac_aarch64=mac_aarch64,
-            mac_x86_64=mac_x86_64,
-            linux_aarch64=linux_aarch64,
-            linux_x86_64=linux_x86_64,
+        targets = (
+            ('aarch64-apple-darwin', 'mac_aarch64'),
+            ('x86_64-apple-darwin', 'mac_x86_64'),
+            ('aarch64-unknown-linux-musl', 'linux_aarch64'),
+            ('x86_64-unknown-linux-musl', 'linux_x86_64'),
         )
+        with cf.ThreadPoolExecutor(max_workers=4) as executor:
+            fut_to_name = {
+                executor.submit(self.get_archive, self.package_artifact_url(target)): name for target, name in targets
+            }
+            kwargs = {fut_to_name[fut]: fut.result() for fut in cf.as_completed(fut_to_name)}
+        archives = Archives(**kwargs)
         formula = self.generate_homebrew_formula(archives)
         formula_path = self.formula.disk_path
         if self.dry_run:
