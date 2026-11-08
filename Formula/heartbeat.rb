@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-# A service to show a live digital heartbeat (ping) on multiple devices 
+# Show a live digital heartbeat (ping) on multiple devices
 class Heartbeat < Formula
-  desc "A service to show a live digital heartbeat (ping) on multiple devices "
+  desc "Show a live digital heartbeat (ping) on multiple devices"
   homepage "https://github.com/lmaotrigine/heartbeat"
-  version "0.1.1"
+  #:version "0.1.1"
   license "MPL-2.0"
 
   if OS.mac?
@@ -29,5 +29,9 @@ class Heartbeat < Formula
 
   def install
     bin.install "heartbeat"
+  end
+
+  test do
+    system "#{bin}/heartbeat", "--version"
   end
 end

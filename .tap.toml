@@ -7,11 +7,28 @@ bins = ["klip"]
 mans = ["doc/klip.1"]
 completions = ["completions/klip.bash", "completions/_klip"]
 darwin_ext = "zip"
+test = """
+conf = testpath/"klip.toml"
+keys = shell_output("#{bin}/klip genkeys")
+lines = keys.lines.grep(/\\s+=\\s+/).map { |l| l.gsub(/\\s+/, " ").gsub(/#.*/, "") }.uniq
+conf.write lines.join("\\n")
+pid = spawn bin/"klip", "-c", conf, "serve"
+begin
+  sleep 1
+  pipe_output("#{bin}/klip -c #{conf} copy", "test", 0)
+  assert_equal "test", shell_output("#{bin}/klip -c #{conf} move")
+ensure
+  Process.kill("TERM", pid)
+  Process.wait(pid)
+end
+"""
 
 [[formula]]
 repo = "lmaotrigine/heartbeat"
 homepage = "https://github.com/lmaotrigine/heartbeat"
-desc = "A service to show a live digital heartbeat (ping) on multiple devices "
+desc = "Show a live digital heartbeat (ping) on multiple devices"
 license = "MPL-2.0"
 bins = ["heartbeat"]
 archive_fmt = "{name}-{version}-{arch}.{ext}"
+# just check whether it executes
+test = 'system "#{bin}/heartbeat", "--version"'

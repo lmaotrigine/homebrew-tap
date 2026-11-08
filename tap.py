@@ -9,6 +9,7 @@ import os
 import re
 import subprocess
 import sys
+import textwrap
 import time
 import tomllib
 from hashlib import sha256
@@ -32,7 +33,7 @@ FORMULA_TEMPLATE = """\
 class {cname} < Formula
   desc "{desc}"
   homepage "{homepage}"
-  version "{version}"
+  #:version "{version}"
   license "{license}"
 {depsfmt}
   if OS.mac?
@@ -56,7 +57,7 @@ class {cname} < Formula
   end
 
   def install{binsfmt}{mansfmt}{completionsfmt}
-  end
+  end{testfmt}
 end
 """
 
@@ -226,7 +227,7 @@ class Completion:
 
     @classmethod
     def parse(cls, s: str) -> Completion:
-        _, ext = os.path.splitext(s)  # noqa: PTH122 # just string parsing
+        _, ext = os.path.splitext(s)  # ruff: ignore[os-path-splitext] # just string parsing
         # zsh is _{prog}
         shell = 'zsh' if not ext else ext.lstrip('.')
         return cls(shell, s)
@@ -248,6 +249,7 @@ class Formula:
         'linux_ext',
         'mans',
         'repo',
+        'test',
     )
 
     def __init__(
@@ -256,7 +258,7 @@ class Formula:
         repo: str,
         homepage: str,
         desc: str,
-        license: str,  # noqa: A002  # why?
+        license: str,  # ruff: ignore[builtin-argument-shadowing]  # why?
         bins: list[str],
         mans: list[Man],
         deps: list[str],
@@ -264,6 +266,7 @@ class Formula:
         archive_fmt: str | None = None,
         linux_ext: str = 'tar.xz',
         darwin_ext: str = 'tar.xz',
+        test: str | None = None,
     ) -> None:
         self.repo: str = repo
         self.homepage: str = homepage
@@ -276,6 +279,7 @@ class Formula:
         self.archive_fmt: str = archive_fmt or '{name}-{arch}.{ext}'
         self.linux_ext: str = linux_ext
         self.darwin_ext: str = darwin_ext
+        self.test: str | None = test
 
     @classmethod
     def from_dict(cls, d: dict[str, Any]) -> Formula:
@@ -291,6 +295,7 @@ class Formula:
             linux_ext=d.get('linux_ext', 'tar.xz'),
             darwin_ext=d.get('darwin_ext', 'tar.xz'),
             archive_fmt=d.get('archive_fmt', '{name}-{arch}.{ext}'),
+            test=d.get('test'),
         )
 
     @property
@@ -314,7 +319,7 @@ class Formula:
         if not disk_path.exists():
             return None
         content = disk_path.read_text(encoding='utf-8')
-        version_line = next(line for line in content.splitlines() if line.strip().startswith('version'))
+        version_line = next(line for line in content.splitlines() if line.strip().startswith('#:version'))
         return version_line.split('"')[1]
 
 
@@ -428,6 +433,9 @@ class HomebrewContext:
         completionsfmt = '\n'.join(f'    {c.format()}' for c in self.formula.completions)
         if completionsfmt:
             completionsfmt = f'\n{completionsfmt}'
+        testfmt = (
+            f'\n\n  test do\n{textwrap.indent(self.formula.test.strip(), "    ")}\n  end' if self.formula.test else ''
+        )
         return FORMULA_TEMPLATE.format(
             cname=to_pascal_case(self.formula.name),
             desc=self.formula.desc,
@@ -446,6 +454,7 @@ class HomebrewContext:
             binsfmt=binsfmt,
             mansfmt=mansfmt,
             completionsfmt=completionsfmt,
+            testfmt=testfmt,
         )
 
 

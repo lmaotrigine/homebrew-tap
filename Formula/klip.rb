@@ -4,7 +4,7 @@
 class Klip < Formula
   desc "Copy/paste anything over the network"
   homepage "https://github.com/lmaotrigine/klip"
-  version "0.3.0"
+  #:version "0.3.0"
   license "MPL-2.0"
 
   if OS.mac?
@@ -32,5 +32,21 @@ class Klip < Formula
     man1.install "doc/klip.1"
     bash_completion.install "completions/klip.bash"
     zsh_completion.install "completions/_klip"
+  end
+
+  test do
+    conf = testpath/"klip.toml"
+    keys = shell_output("#{bin}/klip genkeys")
+    lines = keys.lines.grep(/\s+=\s+/).map { |l| l.gsub(/\s+/, " ").gsub(/#.*/, "") }.uniq
+    conf.write lines.join("\n")
+    pid = spawn bin/"klip", "-c", conf, "serve"
+    begin
+      sleep 1
+      pipe_output("#{bin}/klip -c #{conf} copy", "test", 0)
+      assert_equal "test", shell_output("#{bin}/klip -c #{conf} move")
+    ensure
+      Process.kill("TERM", pid)
+      Process.wait(pid)
+    end
   end
 end
